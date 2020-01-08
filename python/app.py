@@ -30,14 +30,14 @@ def second_number(l: Optional[str]) -> str:
     return "Got second input: " + str(l)
 
 
-def input_numbers(x: Optional[str]) -> io_.IO:
+def input_second_number_and_print_result(x: Optional[str]) -> io_.IO:
     def print_result(y: Optional[str]) -> io_.IO:
         return io_.put_str_ln(app_logic(x, y))
 
     return prompt(None, second_number).bind(print_result)
 
 
-app = prompt("Please input two numbers.", first_number).bind(input_numbers)
+app = prompt("Please input two numbers.", first_number).bind(input_second_number_and_print_result)
 
 if __name__ == "__main__":
     app.unsafeRunIO()
