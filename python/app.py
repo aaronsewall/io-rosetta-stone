@@ -9,14 +9,14 @@ def app_logic(x: Optional[str], y: Optional[str]) -> str:
     return "Result: " + str(int(x) + int(y))
 
 
-def print_maybe(str_m: Optional[str]) -> io_.IO:
+def print_maybe(str_m: Optional[str]) -> io_.IO[str]:
     return io_.put_str_ln(str_m) if str_m is not None else io_._return(None)
 
 
-def prompt(greet: Optional[str], confirm: Callable[[Optional[str]], str]) -> io_.IO:
+def prompt(greet: Optional[str], confirm: Callable[[Optional[str]], str]) -> io_.IO[str]:
     salute = print_maybe(greet)._and(io_.get_line)
 
-    def certify(l: Optional[str]) -> io_.IO:
+    def certify(l: Optional[str]) -> io_.IO[str]:
         return print_maybe(confirm(l))._and(io_._return(l))
 
     return salute.bind(certify)
@@ -30,8 +30,8 @@ def second_number(l: Optional[str]) -> str:
     return "Got second input: " + str(l)
 
 
-def input_second_number_and_print_result(x: Optional[str]) -> io_.IO:
-    def print_result(y: Optional[str]) -> io_.IO:
+def input_second_number_and_print_result(x: Optional[str]) -> io_.IO[str]:
+    def print_result(y: Optional[str]) -> io_.IO[str]:
         return io_.put_str_ln(app_logic(x, y))
 
     return prompt(None, second_number).bind(print_result)

@@ -1,19 +1,19 @@
-from typing import Callable, Optional, TypeVar
+from typing import Callable, Optional, TypeVar, Generic
 
 T = TypeVar("T")
 
 
-class IO:
-    def __init__(self: "IO", run: Callable[[], Optional[T]]) -> None:
+class IO(Generic[T]):
+    def __init__(self, run: Callable[[], Optional[T]]) -> None:
         self.unsafeRunIO = run
 
-    def map(self: "IO", f: Callable[[Optional[T]], Optional[T]]) -> "IO":
+    def map(self, f: Callable[[Optional[T]], Optional[T]]) -> "IO[T]":
         return IO(lambda: f(self.unsafeRunIO()))
 
-    def bind(self: "IO", f: Callable[[Optional[T]], "IO"]) -> "IO":
+    def bind(self, f: Callable[[Optional[T]], "IO[T]"]) -> "IO[T]":
         return IO(lambda: f(self.unsafeRunIO()).unsafeRunIO())
 
-    def _and(self: "IO", other: "IO") -> "IO":
+    def _and(self, other: "IO[T]") -> "IO[T]":
         def go() -> Optional[T]:
             self.unsafeRunIO()
             return other.unsafeRunIO()
@@ -21,11 +21,11 @@ class IO:
         return IO(go)
 
 
-def _return(x: Optional[T]) -> IO:
+def _return(x: Optional[T]) -> IO[T]:
     return IO(lambda: x)
 
 
-def put_str_ln(s: T) -> IO:
+def put_str_ln(s: T) -> IO[T]:
     def go() -> None:
         print(s)
         return None
